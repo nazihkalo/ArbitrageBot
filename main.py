@@ -12,6 +12,7 @@ gas_station_url = "https://ethgasstation.info/api/ethgasAPI.json"
 gas_station_api_key = "ec0e871cf2a6134fc3a1f16eac14ba538d5975eaaf3cba6583ab3e3bb161"
 gas_limit = 3000000
 estimated_gas = 1700000
+found = False
 
 def to_eth(_wei, _token):
     return _wei / (10 ** tokens[_token]["decimals"])
@@ -52,6 +53,7 @@ def test_arbitrage(maker_token, taker_token, estimated_fee, order):
 
     # Log Instructions if Profitable:
     if profit > 0:
+        if not found: found = True
         print(colored(log_arb(taker_amount, taker_token, maker_amount, maker_token, expected_return, return_price, price, estimated_fee, profit), "green"))
 
 def test_pair(maker_token, taker_token, estimated_fee):
@@ -78,6 +80,7 @@ def execute():
     with concurrent.futures.ThreadPoolExecutor() as executor:
         threads = [executor.submit(test_pair, maker_token, taker_token, estimated_fee) for (maker_token, taker_token) in permutations(tokens, 2)]
 
+    if not found: print("No Arbitrage opportunities found.")
     print("All Done!")
 
 execute()
